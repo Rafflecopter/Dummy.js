@@ -50,6 +50,7 @@ DUMMY.set = function(name, data) {
 
 DUMMY.clear = function() {
     DUMMY.data = {};
+    DUMMY.trigger('clear');
     return DUMMY;
 };
 //~~
