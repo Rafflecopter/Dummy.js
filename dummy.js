@@ -5,6 +5,7 @@
 window.DUMMY = window.DUMMY || {
      _built:    {}
     ,_bound:    {}
+    ,_samples:  {}
     ,data:      {}
 };
 
@@ -45,6 +46,7 @@ DUMMY.until = function(cond, callback, freq) {
 //~~ save data for access later
 DUMMY.set = function(name, data) {
     DUMMY.data[name] = data;
+    DUMMY.trigger('built:'+name);
     return DUMMY;
 };
 
@@ -89,7 +91,7 @@ DUMMY.build = function(useCache) {
         //  - func(data){}
         //  - ['url', func(data){}]
 
-        var c = useCache && DUMMY.cache(x)
+        var c = useCache && DUMMY.cache(name)
         ,   m = DUMMY._model[name]
         ,   f = !!m.length ? m[1] : m
         ,   u = !!m.length ? m[0] : false
@@ -112,20 +114,32 @@ DUMMY.build = function(useCache) {
         return [false, 'Please provide a model via DUMMY.model()'];
 
     useCache = useCache || (useCache == undefined);
-
     DUMMY._built = {};
-    for (var x in DUMMY._model) {
-        DUMMY
-            .unbind('built:'+x)
-            .bind('built:'+x, function() {
-                DUMMY._built[x] = true;
-            })
-            
-            ._built[x] = false
 
-        _doModel(x);
-    }
+    // Once all sample types are loaded, build the model
+    DUMMY.until(
+        function cond() {
+            for (var x in DUMMY._samples)
+                if (! DUMMY._samples[x]._loaded) return false;
+            return true;
+        }, 
+
+        function callback() {
+            for (var x in DUMMY._model) {
+                DUMMY
+                    .unbind('built:'+x)
+                    .bind('built:'+x, function() {
+                        DUMMY._built[x] = true;
+                    })
+                    
+                    ._built[x] = false
+
+                _doModel(x);
+            }
+        }
+    );
     
+    // Once all parts of the model have been built, announce it
     DUMMY.until(
         function cond() {
             for (var x in DUMMY._model)
@@ -142,6 +156,23 @@ DUMMY.build = function(useCache) {
 };
 //~~
 
+
+//~~ Generate sample data of different types
+DUMMY.sample = function(type, options) {
+    return DUMMY._samples[type](options);
+};
+
+DUMMY.newSample = function(name, func, options) {
+    // Use {loaded: false} to wait for async data load
+    options = options || {loaded:true};
+    DUMMY._samples[name] = func;
+    DUMMY._samples[name]._loaded = options.loaded;
+};
+
+DUMMY.sampleLoaded = function(name) {
+    DUMMY._samples[name]._loaded = true;
+};
+//~~
 
 
 }());
