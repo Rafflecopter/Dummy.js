@@ -2,23 +2,25 @@
 
 // All names come from http://www.ruf.rice.edu/~pound/
 // would be nicer to get them from a place that servers JSONP
+// then again, maybe it's better to not rely on a connection
 
 function name(options) {
     options = options || {};
-    options.male = options.male==undefined ? true : options.male;
-    options.female = options.female==undefined ? true : options.female;
+    options.male = !(options.male===false)
+    options.female = !(options.female===false)
 
     var f = ((options.male && options.female) && first.male.concat(first.female))
-            || (options.male && first.male)
-            || (options.female && first.female)
+          || (options.male && first.male)
+          || (options.female && first.female)
 
     ,   n = [f[~~(Math.random()*f.length)], last[~~(Math.random()*last.length)]]
 
     return n.join(' ');
 };
 
-
 DUMMY.newSample('name', name);
+
+
 
 
 var first = {

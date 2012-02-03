@@ -1,5 +1,7 @@
 ;(function() {
 
+// take a peek at
+// https://github.com/goncalossilva/dummy/tree/master/lib/dummy
 
 
 window.DUMMY = window.DUMMY || {
