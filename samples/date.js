@@ -8,6 +8,9 @@ function SampleDate(options) {
         ,after:     '2d'
     };
 
+    options.before = options.before==0 ? '0s' : options.before;
+    options.after = options.after==0 ? '0s' : options.after;
+
     var abb = {
          ms:    1
         ,s:     1000
