@@ -1,8 +1,6 @@
 (function() {
 
 // All names come from http://www.ruf.rice.edu/~pound/
-// would be nicer to get them from a place that servers JSONP
-// then again, maybe it's better to not rely on a connection
 
 function name(options) {
     options = options || {};

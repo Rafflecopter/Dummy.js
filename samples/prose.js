@@ -1,5 +1,7 @@
 (function() {
 
+// Would be nice to have a few more books and/or fetch them from a server
+
 var units = {
     char: function(len) {
         var sent = sherlock.split('.')
