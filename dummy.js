@@ -87,25 +87,27 @@ DUMMY.model = function(m) {
     return DUMMY;
 };
 
-DUMMY.build = function(useCache) {
-    function _doModel(name) {
+// please oh please refactor me:
+DUMMY.build = function(name, options, useCache) {
+    function _doModel(mod) {
         // model can be like either:
         //  - func(data){}
         //  - ['url', func(data){}]
 
-        var c = useCache && DUMMY.cache(name)
-        ,   m = DUMMY._model[name]
-        ,   f = !!m.length ? m[1] : m
-        ,   u = !!m.length ? m[0] : false
+        var c = useCache && DUMMY.cache(mod)
+        ,   m = DUMMY._model[mod]
+        ,   f = (m.length>1) ? m[1] : m
+        ,   u = (m.length>1) ? m[0] : false
+        ;
     
         if (c) {
-            f(c);
+            f(c, options);
         } else if (!u) {
-            f();
+            f(options);
         } else if ($ && $.getJSON) {
             $.getJSON(u, function(d) {
-                DUMMY.cache(name, d);
-                f(d);
+                DUMMY.cache(mod, d);
+                f(d, options);
             });
         } else if (! ($ && $.getJSON)) {
             console.log('You need [a] jQuery[-compatible library] to auto-fetch JSON');
@@ -117,6 +119,9 @@ DUMMY.build = function(useCache) {
 
     DUMMY._built = {};
 
+    if (typeof name == 'boolean'){ useCache = name; name=undefined };
+    if (typeof options == 'boolean'){ useCache = options; options=undefined };
+
     // Once all sample types are loaded, build the model
     DUMMY.until(
         function cond() {
@@ -126,7 +131,9 @@ DUMMY.build = function(useCache) {
         }, 
 
         function callback() {
-            for (var x in DUMMY._model) {
+            var arr = !name ? DUMMY._model : (function(){var a={};a[name]='';return a}());
+
+            for (var x in arr) {
                 DUMMY
                     .unbind('built:'+x)
                     .bind('built:'+x, function() {
@@ -143,7 +150,8 @@ DUMMY.build = function(useCache) {
     // Once all parts of the model have been built, announce it
     DUMMY.until(
         function cond() {
-            for (var x in DUMMY._model)
+            var arr = !name ? DUMMY._model : (function(){var a={};a[name]='';return a}());
+            for (var x in arr)
                 if (! DUMMY._built[x]) return false;
             return true;
         }
