@@ -1,12 +1,12 @@
 (function() {
 
 
-// wgt is like [['choice1',2], ['choice2',4], ['choice3', 8]]
+// wgt is like [[2,'choice1'], [4,'choice2'], [8,'choice3']]
 function Weighted(wgt) {
     var norm = (function() {
         var out=[[],[]], count=0;
-        for (var w in wgt) count += wgt[w][1];
-        for (var w in wgt) out[0].push(wgt[w][1]/count), out[1].push(wgt[w][0]);
+        for (var w in wgt) count += wgt[w][0];
+        for (var w in wgt) out[0].push(wgt[w][0]/count), out[1].push(wgt[w][1]);
         return out;
     }())
 

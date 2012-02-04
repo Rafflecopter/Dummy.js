@@ -30,7 +30,7 @@ function SampleDate(options) {
     ,   before = num.before * abb[unit.before]
     ,   after  = num.after * abb[unit.after]
 
-    return new Date( (+options.base - before) + (~~(Math.random() * after)) );
+    return new Date( (+options.base - before) + (~~(Math.random() * (before + after))) );
 }
 
 DUMMY.newSample('date', SampleDate);

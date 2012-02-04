@@ -115,7 +115,6 @@ DUMMY.build = function(useCache) {
     if (! DUMMY._model)
         return [false, 'Please provide a model via DUMMY.model()'];
 
-    useCache = useCache || (useCache == undefined);
     DUMMY._built = {};
 
     // Once all sample types are loaded, build the model
@@ -164,11 +163,25 @@ DUMMY.sample = function(type, options) {
     return DUMMY._samples[type](options);
 };
 
-DUMMY.newSample = function(name, func, options) {
-    // Use {loaded: false} to wait for async data load
-    options = options || {loaded:true};
-    DUMMY._samples[name] = func;
-    DUMMY._samples[name]._loaded = options.loaded;
+DUMMY.newSample = function(name, func, url, proc) {
+    if (url) {
+        DUMMY._samples[name] = function(options) {
+            return func(DUMMY.cache('sample-'+name), options);
+        }
+        
+        if (!DUMMY.cache('sample-'+name)) {
+            proc = proc || function(d){return d};
+            return $.getJSON(url, function(data) {
+                DUMMY.cache('sample-'+name, proc(data));
+                DUMMY.sampleLoaded(name);
+            });
+        }
+    } else {
+        DUMMY._samples[name] = func;
+    }
+
+    // Only get here if no url or data not cached
+    DUMMY.sampleLoaded(name);
 };
 
 DUMMY.sampleLoaded = function(name) {
