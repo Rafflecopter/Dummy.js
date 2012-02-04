@@ -2,14 +2,12 @@
 
 
 function SampleDate(options) {
-    options = options || {
-         base:      new Date
-        ,before:    '2d'
-        ,after:     '2d'
-    };
+    options.base = options.base || new Date;
 
     options.before = options.before==0 ? '0s' : options.before;
+    options.before = options.before || '2d';
     options.after = options.after==0 ? '0s' : options.after;
+    options.after = options.after || '2d';
 
     var abb = {
          ms:    1
